@@ -17,6 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import javax.persistence.CascadeType;
+import javax.persistence.OneToMany;
+
 @Controller
 public class SchoolController {
 
@@ -35,8 +38,7 @@ public class SchoolController {
     }
 
     @GetMapping("/school/register")
-    public String inscription(Model out,
-                              @RequestParam Long idSchool) {
+    public String inscription(Model out, @RequestParam Long idSchool) {
 
         Optional<School> optionalSchool = schoolRepository.findById(idSchool);
         School school = new School();
@@ -48,8 +50,7 @@ public class SchoolController {
 
         // call the method getWizards in School
         List<Wizard> wizards = new ArrayList<>();
-        Method method = getMethod(school, "getWizards",
-                new Class[]{});
+        Method method = getMethod(school, "getWizards", new Class[]{});
         if (method != null) {
             try {
                 wizards = (List<Wizard>) method.invoke(school);
@@ -63,20 +64,21 @@ public class SchoolController {
     }
 
     @PostMapping("/school/register")
-    public String inscription(@RequestParam Long idSchool,
-                              @RequestParam Long idWizard) {
+    public String inscription(@RequestParam Long idSchool, @RequestParam Long idWizard) {
 
         Optional<Wizard> optionalWizard = wizardRepository.findById(idWizard);
+        
         if (optionalWizard.isPresent()) {
             Wizard wizard = optionalWizard.get();
 
             Optional<School> optionalSchool = schoolRepository.findById(idSchool);
+            
             if (optionalSchool.isPresent()) {
                 School school = optionalSchool.get();
 
                 // call the method setSchool in Wizard
-                Method method = getMethod(wizard, "setSchool",
-                        new Class[]{School.class});
+                Method method = getMethod(wizard, "setSchool", new Class[]{School.class});
+                
                 if (method != null) {
                     try {
                         method.invoke(wizard, school);
